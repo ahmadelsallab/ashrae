@@ -1,0 +1,115 @@
+https://www.kaggle.com/caesarlupum/ashrae-start-here-a-gentle-introduction
+
+https://www.kaggle.com/vikassingh1996/ashrae-great-energy-insightful-simple-eda
+
+-
+    start_mem = df.memory_usage().sum() / 1024**2
+    print('Memory usage of dataframe is {:.2f} MB'.format(start_mem))
+- 
+'''Variable Description'''
+def description(df):
+    summary = pd.DataFrame(df.dtypes,columns=['dtypes'])
+    summary = summary.reset_index()
+    summary['Name'] = summary['index']
+    summary = summary[['Name','dtypes']]
+    summary['Missing'] = df.isnull().sum().values    
+    summary['Uniques'] = df.nunique().values
+    summary['First Value'] = df.iloc[0].values
+    summary['Second Value'] = df.iloc[1].values
+    summary['Third Value'] = df.iloc[2].values
+    return summary
+-   bold('**Variable Description of  train Data:**')
+
+- 
+train["timestamp"] = pd.to_datetime(train["timestamp"])
+train["hour"] = train["timestamp"].dt.hour
+train["day"] = train["timestamp"].dt.day
+train["weekday"] = train["timestamp"].dt.weekday_name 
+train["month"] = train["timestamp"].dt.month
+train['year'] = train['timestamp'].dt.year
+
+- 
+bold('**UTILITIES AND HEALTHCARE HAVE THE HIGHEST READINGS**')
+
+- 
+
+bold('**READINGS HIGHEST DURING THE MIDDLE OF THE DAY**')
+plt.rcParams['figure.figsize'] = (18,10)
+temp_df = train.groupby('hour').meter_reading.sum()
+temp_df.plot(linewidth = 5, color = 'teal')
+plt.xlabel('Reading Hour', fontsize = 15)
+plt.ylabel('Meter Reading')
+plt.show()
+
+- SUNDAYS HAVE THE LOWEST READINGS
+
+https://www.kaggle.com/rohanrao/ashrae-divide-and-conquer
+
+- KFold Cross Validation with LGBM
+
+https://www.kaggle.com/hmendonca/clean-weather-data-eda
+
+- Good EDA (time avg per site)
+- Missing temp interp
+
+
+https://www.kaggle.com/grapestone5321/ashrae-stacking-method
+- Good ensemble
+
+
+https://www.kaggle.com/kulkarnivishwanath/ashrae-great-energy-predictor-iii-eda-model
+Print groupby using agg
+
+- train.groupby(['meter','Month'])['meter_reading'].agg(['max','mean','median','count','std'])    
+    
+    
+- metadata.groupby('primary_use')['square_feet'].agg(['count','mean','median']).sort_values(by='count')
+
+- LabelEncoder for meter (type) and primary_use
+
+- FeatureImportance (lgb)
+
+
+https://www.kaggle.com/haataa/deep-eda-with-time-series-knowledge
+- sns.heatmap(corr, vmin=-1, vmax=1, annot=True)
+
+https://www.kaggle.com/nroman/eda-for-ashrae
+- By Hour, By Day
+- wind_rose
+
+
+https://www.kaggle.com/drcapa/ashrae-feature-engineering-merge-data
+- Cyclic month, day, hour --> sin, cos
+- SimpleImputer
+
+https://www.kaggle.com/kaushal2896/ashrae-eda-fe-lightgbm-1-12
+- ax = sns.barplot(le.inverse_transform(full_train_df.groupby(['primary_use']).size().reset_index(name='counts')['primary_use']), full_train_df.groupby(['primary_use']).size().reset_index(name='counts')['counts'])
+
+- year_built:
+full_train_df['year_built'].value_counts(dropna=False).sort_index().plot(ax=ax)
+
+
+https://www.kaggle.com/isaienkov/keras-nn-with-embeddings-for-cat-features-1-15
+- Keras: concat(cat emb + numerical features)
+
+https://www.kaggle.com/hiteshsom/ashrae-3-lightgbm/notebook
+LGBM
+--> lgb.fit + train_df.col.astype('category)
+vs.
+https://sefiks.com/2018/10/13/a-gentle-introduction-to-lightgbm-for-applied-machine-learning/
+
+lgb.Dataset --> categorical_feature=..
+lg.train
+--> this is the official way in the doc: https://lightgbm.readthedocs.io/en/latest/Python-Intro.html
+https://github.com/microsoft/LightGBM/blob/master/examples/python-guide/simple_example.py
+
+But in both methods, you must set the type of cat features to 'category' in the dataframe using astype('category')
+see: https://stackoverflow.com/questions/56070396/why-does-categorical-feature-of-lightgbm-not-work
+
+"The problem is that lightgbm can handle only features, that are of category type, not object. Here the list of all possible categorical features is extracted. Such features are encoded into integers in the code. But nothing happens to objects and thus lightgbm complains, when it finds that not all features have been transformed into numbers.
+
+So the solution is to do
+
+for c in categorical_feats:
+    train[categorical_feats] = train[categorical_feats].astype('category')
+before your CV loop"
